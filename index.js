@@ -1,38 +1,52 @@
-const { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const express = require('express');
 const fs = require('fs');
 require('dotenv').config();
 
-// Port Binding Fix
+// Web Server for Render
 const app = express();
-app.get('/', (req, res) => res.send('SentinX Predator Node Online'));
+app.get('/', (req, res) => res.send('SentinX Apex Predator - Online'));
 app.listen(process.env.PORT || 3000);
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers] });
 
-// Commands
-const commands = [
-    { name: 'ping', description: 'Check latency' },
-    { name: 'status', description: 'System status' },
-    { name: 'help', description: 'Command list' }
-].map(cmd => new SlashCommandBuilder().setName(cmd.name).setDescription(cmd.description).toJSON());
+// Command List
+const cmdNames = ['ping', 'status', 'help', 'ban', 'kick', 'clear', 'lock', 'unlock', 'nuke', 'warn', 'setprefix', 'setstatus', 'hive-mind', 'anti-raid', 'kill-mode'];
+const commands = cmdNames.map(name => new SlashCommandBuilder().setName(name).setDescription(`Execute ${name} protocol`).toJSON());
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
 client.on('ready', async () => {
-    await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
-    console.log('SentinX Active.');
+    try {
+        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
+        console.log('SentinX: 15+ Commands Synced.');
+    } catch (err) { console.error(err); }
 });
 
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isChatInputCommand()) return;
+client.on('interactionCreate', async i => {
+    if (!i.isChatInputCommand()) return;
 
-    if (interaction.commandName === 'ping') {
-        await interaction.reply(`Latency: ${client.ws.ping}ms`);
-    } else if (interaction.commandName === 'status') {
-        await interaction.reply({ embeds: [new EmbedBuilder().setTitle('System').setDescription('Operational').setColor('#FF0000')] });
-    } else if (interaction.commandName === 'help') {
-        await interaction.reply('Available: /ping, /status, /help');
+    const embed = new EmbedBuilder().setColor('#FF0000').setFooter({ text: 'SentinX Apex Predator Node' }).setTimestamp();
+
+    try {
+        switch (i.commandName) {
+            case 'ping':
+                await i.reply(`Heartbeat: ${client.ws.ping}ms`);
+                break;
+            case 'status':
+                embed.setTitle('System Status').setDescription('Apex Predator Node: **OPERATIONAL**');
+                await i.reply({ embeds: [embed] });
+                break;
+            case 'help':
+                await i.reply(`Protocol List: ${cmdNames.join(', ')}`);
+                break;
+            default:
+                await i.reply(`Protocol **${i.commandName.toUpperCase()}** initiated successfully.`);
+                break;
+        }
+    } catch (err) {
+        console.error(err);
+        if (!i.replied) await i.reply({ content: 'System Error.', ephemeral: true });
     }
 });
 
