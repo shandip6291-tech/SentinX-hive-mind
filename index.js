@@ -1,76 +1,61 @@
 const { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder } = require('discord.js');
-const http = require('http');
 const express = require('express');
 const app = express();
 require('dotenv').config();
 
-// --- DASHBOARD & KEEP-ALIVE SERVER ---
-app.get('/', (req, res) => {
-    res.send(`
-        <html>
-            <body style="background:#000; color:#0f0; font-family: 'Courier New', Courier, monospace; text-align: center; padding-top: 50px;">
-                <h1>SentinX Intelligence Dashboard</h1>
-                <p>System Status: OPERATIONAL</p>
-                <p>Apex Predator Mode: ACTIVE</p>
-            </body>
-        </html>
-    `);
-});
+// Dashboard Server
+app.get('/', (req, res) => res.send('SentinX Apex Predator Online'));
 app.listen(process.env.PORT || 3000);
 
-// --- BOT CONFIGURATION ---
 const client = new Client({ 
-    intents: [
-        GatewayIntentBits.Guilds, 
-        GatewayIntentBits.GuildMessages, 
-        GatewayIntentBits.MessageContent
-    ] 
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] 
 });
 
-// --- COMMAND REGISTRATION ---
+// Professional Embed Template
+const createEmbed = (title, description, color) => {
+    return new EmbedBuilder()
+        .setTitle(title)
+        .setDescription(description)
+        .setColor(color)
+        .setTimestamp()
+        .setFooter({ text: 'SentinX Intelligence | Apex Predator Node v1.0 | Developed by [Your Name]' });
+};
+
+// Command Setup
 const commands = [
-    new SlashCommandBuilder().setName('ping').setDescription('Check SentinX heartbeat'),
-    new SlashCommandBuilder().setName('status').setDescription('System health check'),
-    new SlashCommandBuilder().setName('hive-mind').setDescription('Sync SentinX nodes'),
-    new SlashCommandBuilder().setName('anti-raid').setDescription('Toggle security')
-].map(command => command.toJSON());
+    new SlashCommandBuilder().setName('ping').setDescription('Check system latency'),
+    new SlashCommandBuilder().setName('status').setDescription('View system health'),
+    new SlashCommandBuilder().setName('hive-mind').setDescription('Sync predator nodes'),
+    new SlashCommandBuilder().setName('anti-raid').setDescription('Toggle security shield')
+].map(cmd => cmd.toJSON());
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
-(async () => {
+client.on('ready', async () => {
     try {
         await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
-        console.log('Successfully registered all commands.');
+        console.log('SentinX [Apex Predator] is LIVE & Commands Synced.');
     } catch (e) { console.error(e); }
-})();
-
-// --- CORE LOGIC ---
-client.on('messageCreate', async message => {
-    if (message.author.bot) return;
-    
-    if (message.content.startsWith('!ai')) {
-        await message.reply('SentinX AI: Processing query... Analysis complete: Apex Predator protocol suggests maximum efficiency.');
-    }
-    
-    if (message.content.toLowerCase() === 'warning-trigger') {
-        const embed = new EmbedBuilder()
-            .setColor('#ff0000')
-            .setTitle('SentinX | Security Protocol')
-            .setDescription('Inappropriate activity detected. Immediate cessation required.');
-        message.channel.send({ embeds: [embed] });
-    }
 });
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
-    if (interaction.commandName === 'ping') await interaction.reply('SentinX is live and optimized!');
-    if (interaction.commandName === 'status') await interaction.reply('Status: All systems GREEN. Hive Mind synced.');
-    if (interaction.commandName === 'hive-mind') await interaction.reply('🔗 Hive Mind established. Nodes connected.');
-    if (interaction.commandName === 'anti-raid') await interaction.reply('🛡️ Anti-Raid: ACTIVE. Monitoring for threats.');
-});
 
-client.once('ready', () => {
-    console.log(`SentinX [Apex Predator] is LIVE: ${client.user.tag}`);
+    if (interaction.commandName === 'ping') {
+        await interaction.reply({ embeds: [createEmbed('📡 System Latency', `Heartbeat: ${client.ws.ping}ms`, '#00C853')] });
+    }
+    
+    if (interaction.commandName === 'status') {
+        await interaction.reply({ embeds: [createEmbed('⚙️ System Status', '**Node:** Operational\n**Apex Mode:** Active\n**Hive Mind:** Synced', '#FFD600')] });
+    }
+
+    if (interaction.commandName === 'hive-mind') {
+        await interaction.reply({ embeds: [createEmbed('🔗 Hive Mind', 'Global predator nodes synchronized successfully.', '#00C853')] });
+    }
+
+    if (interaction.commandName === 'anti-raid') {
+        await interaction.reply({ embeds: [createEmbed('🛡️ Security Protocol', 'Anti-Raid monitoring set to: **MAXIMUM**', '#D50000')] });
+    }
 });
 
 client.login(process.env.DISCORD_TOKEN);
