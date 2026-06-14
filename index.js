@@ -1,21 +1,26 @@
 const { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder } = require('discord.js');
-const http = require('http'); 
+const http = require('http');
 require('dotenv').config();
 
-// --- DUMMY SERVER FOR RENDER ---
+// --- RENDER DUMMY SERVER (SERVER KO LIVE RAKHNE KE LIYE) ---
 http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.write('SentinX is online!');
+    res.write('SentinX is online and guarding the server!');
     res.end();
 }).listen(process.env.PORT || 3000, () => {
     console.log('Dummy web server is running on port 3000');
 });
-// -------------------------------
+// ------------------------------------------------------------
 
 const client = new Client({ 
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] 
+    intents: [
+        GatewayIntentBits.Guilds, 
+        GatewayIntentBits.GuildMessages, 
+        GatewayIntentBits.MessageContent
+    ] 
 });
 
+// Commands Setup
 const commands = [
     new SlashCommandBuilder().setName('ping').setDescription('Check SentinX heartbeat'),
     new SlashCommandBuilder().setName('status').setDescription('Check SentinX operational status'),
@@ -24,6 +29,7 @@ const commands = [
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
+// Register slash commands
 (async () => {
     try {
         await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
@@ -31,6 +37,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     } catch (error) { console.error('Error registering commands:', error); }
 })();
 
+// Command Handler
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
@@ -39,6 +46,7 @@ client.on('interactionCreate', async interaction => {
     if (interaction.commandName === 'honeypot-setup') await interaction.reply('Honeypot trap initialized. Watching for intruders...');
 });
 
+// Message Handler
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
 
