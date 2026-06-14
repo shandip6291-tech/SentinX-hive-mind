@@ -1,38 +1,33 @@
-const { Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder } = require('discord.js');
 require('dotenv').config();
 
 const client = new Client({ 
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] 
 });
 
-// --- PREDATOR SETTINGS ---
-const FORBIDDEN_WORDS = ["scam", "spamlink", "badword1"];
+// Commands definition
+const commands = [
+    new SlashCommandBuilder().setName('ping').setDescription('Check SentinX heartbeat'),
+    new SlashCommandBuilder().setName('status').setDescription('Check SentinX operational status'),
+    new SlashCommandBuilder().setName('honeypot-setup').setDescription('Initialize Honeypot trap')
+].map(command => command.toJSON());
 
-client.on('ready', () => {
-    console.log(`SentinX [Apex Predator] is live: ${client.user.tag}`);
-});
+const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
-client.on('messageCreate', async (message) => {
-    if (message.author.bot) return;
+// Register commands
+(async () => {
+    try {
+        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
+        console.log('Successfully registered slash commands.');
+    } catch (error) { console.error(error); }
+})();
 
-    // 1. SOFT DIPLOMACY (Warning Logic)
-    if (message.content.includes("warning-trigger")) {
-        const warning = new EmbedBuilder()
-            .setColor(0x00FF00)
-            .setTitle('SentinX | Diplomatic Warning')
-            .setDescription('Please refrain from inappropriate activity. This is your only warning.');
-        return message.reply({ embeds: [warning] });
-    }
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isChatInputCommand()) return;
 
-    // 2. APEX PREDATOR (Security Logic)
-    if (FORBIDDEN_WORDS.some(word => message.content.toLowerCase().includes(word))) {
-        await message.delete();
-        const alert = new EmbedBuilder()
-            .setColor(0xFF0000)
-            .setTitle('SentinX | Security Breach')
-            .setDescription(`Detected prohibited content from ${message.author.username}. Action: Quarantined.`);
-        return message.channel.send({ embeds: [alert] });
-    }
+    if (interaction.commandName === 'ping') await interaction.reply('SentinX is active! 🚀');
+    if (interaction.commandName === 'status') await interaction.reply('System Status: All protocols operational. Apex Predator mode active.');
+    if (interaction.commandName === 'honeypot-setup') await interaction.reply('Honeypot trap initialized. Watching for intruders...');
 });
 
 client.login(process.env.DISCORD_TOKEN);
