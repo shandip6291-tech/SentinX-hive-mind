@@ -1,66 +1,63 @@
 const { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder } = require('discord.js');
 const http = require('http');
+const express = require('express');
+const app = express();
 require('dotenv').config();
 
-// --- RENDER DUMMY SERVER (SERVER KO LIVE RAKHNE KE LIYE) ---
-http.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.write('SentinX is online and guarding the server!');
-    res.end();
-}).listen(process.env.PORT || 3000, () => {
-    console.log('Dummy web server is running on port 3000');
+// --- 1. DASHBOARD & KEEP-ALIVE SERVER (APPLE-STYLE UI FOUNDATION) ---
+app.get('/', (req, res) => {
+    res.send('<h1>SentinX Intelligence Dashboard</h1><p>System Status: Online</p><style>body{background:#000;color:#fff;font-family:sans-serif;}</style>');
 });
-// ------------------------------------------------------------
+app.listen(process.env.PORT || 3000);
 
+// --- 2. BOT SETUP ---
 const client = new Client({ 
-    intents: [
-        GatewayIntentBits.Guilds, 
-        GatewayIntentBits.GuildMessages, 
-        GatewayIntentBits.MessageContent
-    ] 
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] 
 });
 
-// Commands Setup
+// --- 3. COMMANDS ---
 const commands = [
     new SlashCommandBuilder().setName('ping').setDescription('Check SentinX heartbeat'),
-    new SlashCommandBuilder().setName('status').setDescription('Check SentinX operational status'),
-    new SlashCommandBuilder().setName('honeypot-setup').setDescription('Initialize Honeypot trap')
+    new SlashCommandBuilder().setName('status').setDescription('System health check'),
+    new SlashCommandBuilder().setName('hive-mind').setDescription('Sync SentinX nodes'),
+    new SlashCommandBuilder().setName('anti-raid').setDescription('Toggle security')
 ].map(command => command.toJSON());
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
-// Register slash commands
 (async () => {
     try {
         await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
-        console.log('Successfully registered slash commands.');
-    } catch (error) { console.error('Error registering commands:', error); }
+    } catch (e) { console.error(e); }
 })();
 
-// Command Handler
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isChatInputCommand()) return;
-
-    if (interaction.commandName === 'ping') await interaction.reply('SentinX is active! 🚀');
-    if (interaction.commandName === 'status') await interaction.reply('System Status: All protocols operational. Apex Predator mode active.');
-    if (interaction.commandName === 'honeypot-setup') await interaction.reply('Honeypot trap initialized. Watching for intruders...');
-});
-
-// Message Handler
+// --- 4. AI SUPER INTELLIGENCE (SIMULATED BRAIN) ---
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
-
+    
+    // Yahan tera AI logic activate hoga
+    if (message.content.startsWith('!ai')) {
+        await message.reply('SentinX AI: Analysis complete. Processing your query with Apex intelligence...');
+    }
+    
+    // Security Trigger
     if (message.content.toLowerCase() === 'warning-trigger') {
         const embed = new EmbedBuilder()
             .setColor('#ff0000')
-            .setTitle('SentinX | Diplomatic Warning')
-            .setDescription('Please refrain from inappropriate activity. This is your only warning.');
+            .setTitle('SentinX | Threat Detected')
+            .setDescription('Security protocol active. Neutralizing...');
         message.channel.send({ embeds: [embed] });
     }
 });
 
+client.on('interactionCreate', async interaction => {
+    if (!interaction.isChatInputCommand()) return;
+    if (interaction.commandName === 'ping') await interaction.reply('SentinX is live and optimized!');
+    if (interaction.commandName === 'status') await interaction.reply('Status: Apex Predator level intelligence operational.');
+});
+
 client.once('ready', () => {
-    console.log(`SentinX [Apex Predator] is live: ${client.user.tag}`);
+    console.log(`SentinX [Apex Predator] is LIVE: ${client.user.tag}`);
 });
 
 client.login(process.env.DISCORD_TOKEN);
