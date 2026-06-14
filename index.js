@@ -1,41 +1,42 @@
 const { Client, GatewayIntentBits, EmbedBuilder, PermissionsBitField, MessageFlags } = require('discord.js');
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+const http = require('http');
 
-// AUTO-MODERATION ENGINE
-client.on('messageCreate', async message => {
-    if (message.author.bot) return;
-    // Yahan tu future mein bad words/links block karne ka logic daalega
+// Render port binding fix
+const server = http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end('SentinX Security Cluster: Online');
+});
+server.listen(process.env.PORT || 3000);
+
+const client = new Client({ 
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] 
 });
 
 client.on('interactionCreate', async i => {
     if (!i.isChatInputCommand()) return;
-    const embed = new EmbedBuilder().setColor('#0099ff').setTimestamp();
+    
+    // Command Logic
     const cmd = i.commandName;
+    const embed = new EmbedBuilder().setColor('#ff0000').setTimestamp();
 
     try {
-        if (cmd === 'ping') await i.reply({ content: `Pong! ${client.ws.ping}ms` });
-        
+        if (cmd === 'ping') {
+            await i.reply({ embeds: [embed.setTitle('📡 Latency').setDescription(`${client.ws.ping}ms`)] });
+        } 
         else if (cmd === 'ban') {
-            const t = i.options.getMember('target');
-            if (!i.member.permissions.has(PermissionsBitField.Flags.BanMembers)) return i.reply({ content: '❌ No Perms.', flags: [MessageFlags.Ephemeral] });
-            await t.ban();
-            await i.reply({ embeds: [embed.setTitle('🔨 Banned').setDescription(`${t.user.tag} has been secured.`)] });
+            const target = i.options.getMember('target');
+            if (!target) return i.reply({ content: '❌ Target not found.', flags: [MessageFlags.Ephemeral] });
+            await target.ban({ reason: 'Security Breach' });
+            await i.reply({ embeds: [embed.setTitle('🔨 Banned').setDescription(`${target.user.tag} purged.`)] });
         }
-
-        else if (cmd === 'clear') {
-            const amt = i.options.getInteger('amount') || 5;
-            await i.channel.bulkDelete(amt);
-            await i.reply({ content: `✅ Purged ${amt} logs.`, flags: [MessageFlags.Ephemeral] });
-        }
-        
-        else if (cmd === 'status') {
-            await i.reply({ embeds: [embed.setTitle('🛡️ SentinX Status').setDescription('All protocols operational. Anti-Raid: ACTIVE')] });
-        }
-        
         else {
-            await i.reply({ content: `Protocol **${cmd}** operational.`, flags: [MessageFlags.Ephemeral] });
+            // Default response agar koi command ka logic nahi likha
+            await i.reply({ content: `Protocol **${cmd.toUpperCase()}** is active.`, flags: [MessageFlags.Ephemeral] });
         }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+        console.error(e);
+        await i.reply({ content: '❌ System Error.', flags: [MessageFlags.Ephemeral] });
+    }
 });
 
 client.login(process.env.DISCORD_TOKEN);
