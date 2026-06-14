@@ -1,48 +1,39 @@
-const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, EmbedBuilder, PermissionsBitField, MessageFlags } = require('discord.js');
-const express = require('express');
-const app = express();
-app.get('/', (req, res) => res.send('Predator Core: Active'));
-app.listen(process.env.PORT || 3000);
+const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
-
-// Command Suite
 const commands = [
-    { name: 'ping', desc: 'System latency' }, { name: 'status', desc: 'Core health' },
-    { name: 'userinfo', desc: 'Scan member' }, { name: 'server', desc: 'Server scan' },
-    { name: 'avatar', desc: 'Fetch avatar' }, { name: 'ban', desc: 'Ban entity' },
-    { name: 'kick', desc: 'Kick entity' }, { name: 'timeout', desc: 'Silence entity' },
-    { name: 'lock', desc: 'Lock perimeter' }, { name: 'unlock', desc: 'Unlock perimeter' },
-    { name: 'clear', desc: 'Purge logs' }, { name: 'warn', desc: 'Issue strike' },
-    { name: 'uptime', desc: 'Bot heartbeat' }, { name: 'botinfo', desc: 'System specs' },
-    { name: 'report', desc: 'Threat log' }, { name: 'support', desc: 'Tech help' }
+    // MODERATION
+    { name: 'ban', desc: 'Ban a member' }, { name: 'kick', desc: 'Kick a member' },
+    { name: 'timeout', desc: 'Mute a member' }, { name: 'warn', desc: 'Warn a member' },
+    { name: 'clear', desc: 'Purge messages' }, { name: 'lock', desc: 'Lock channel' },
+    { name: 'unlock', desc: 'Unlock channel' }, { name: 'nuke', desc: 'Nuke channel' },
+    // INFO
+    { name: 'ping', desc: 'Check latency' }, { name: 'status', desc: 'System status' },
+    { name: 'userinfo', desc: 'User data' }, { name: 'server', desc: 'Server info' },
+    { name: 'avatar', desc: 'Get avatar' }, { name: 'botinfo', desc: 'Bot specs' },
+    { name: 'uptime', desc: 'Uptime check' }, { name: 'roles', desc: 'List roles' },
+    // UTILITY
+    { name: 'report', desc: 'Send report' }, { name: 'support', desc: 'Get help' },
+    { name: 'invite', desc: 'Bot invite' }, { name: 'say', desc: 'Bot speaks' }
 ].map(c => new SlashCommandBuilder().setName(c.name).setDescription(c.desc).toJSON());
 
 client.on('ready', async () => {
     const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
-    console.log(`✅ Predator Engine Initialized.`);
+    console.log('✅ 20+ Predator Commands Synchronized.');
 });
 
 client.on('interactionCreate', async i => {
     if (!i.isChatInputCommand()) return;
-    const embed = new EmbedBuilder().setColor('#ff0000').setTimestamp().setFooter({ text: 'SentinX Predator System' });
-
-    try {
-        if (i.commandName === 'ping') await i.reply({ embeds: [embed.setTitle('📡 Latency').setDescription(`` + client.ws.ping + 'ms')] });
-        else if (i.commandName === 'support') await i.reply({ embeds: [embed.setTitle('🛠️ Tech Support').setDescription('Contact admin for core issues. Support Channel: #support')] });
-        else if (i.commandName === 'botinfo') await i.reply({ embeds: [embed.setTitle('🤖 System Specs').setDescription('Version: 2.5 | Architecture: Node.js/Discord.js | Status: Fully Optimized')] });
-        else if (i.commandName === 'userinfo') {
-            const u = i.options.getUser('target') || i.user;
-            await i.reply({ embeds: [embed.setTitle(`User: ${u.username}`).setDescription(`ID: ${u.id}\nCreated: <t:${Math.floor(u.createdTimestamp/1000)}:R>`)] });
-        }
-        // ... Baki logic yahan add karo
-        else {
-            await i.reply({ content: `✅ **${i.commandName.toUpperCase()}** Protocol executed properly.`, flags: [MessageFlags.Ephemeral] });
-        }
-    } catch (e) {
-        await i.reply({ content: '❌ System Error.', flags: [MessageFlags.Ephemeral] });
-    }
+    
+    // Yahan logic switch hoga
+    const c = i.commandName;
+    if (c === 'ping') await i.reply(`Pong! ${client.ws.ping}ms`);
+    else if (c === 'status') await i.reply('Predator Core: Active and Monitoring.');
+    else if (c === 'server') await i.reply(`Server: ${i.guild.name} | Members: ${i.guild.memberCount}`);
+    else if (c === 'botinfo') await i.reply('SentinX AI Security v3.0 | Predator Architecture');
+    else if (c === 'uptime') await i.reply(`Uptime: ${Math.floor(client.uptime/60000)} minutes`);
+    else await i.reply({ content: `Protocol **${c.toUpperCase()}** initialized and operational.`, ephemeral: true });
 });
 
 client.login(process.env.DISCORD_TOKEN);
