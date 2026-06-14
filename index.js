@@ -10,319 +10,333 @@ const client = new Client({
     ] 
 });
 
-// --- ULTRA-PREMIUM APPLE REG-GLOW SYSTEM INTERFACE ---
-const getAdvancedDashboard = (ping) => `
+// --- APEX ULTRA PREMIUM NEON-GLOW APPLE ARCHITECTURE INTERFACE ---
+const getUltraDashboard = (ping) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SentinX Apex | Command Center</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800;900&display=swap" rel="stylesheet">
+    <title>SentinX Apex | Cybernetic AI Console</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --apple-red: #ff3b30;
-            --apple-dark-bg: #000000;
-            --apple-card-bg: rgba(22, 22, 23, 0.6);
-            --apple-glass-border: rgba(255, 255, 255, 0.06);
-            --io-transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            --ios-red: #ff3b30;
+            --ios-dark-bg: #020202;
+            --ios-card-glass: rgba(18, 18, 20, 0.65);
+            --ios-border-glass: rgba(255, 255, 255, 0.07);
+            --ios-text-secondary: #8e8e93;
+            --ios-glow: 0 0 30px rgba(255, 59, 48, 0.25);
+            --io-curve: cubic-bezier(0.25, 1, 0.5, 1);
+            --io-speed: 0.6s;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
-        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,59,48,0.3); border-radius: 10px; }
+
         body {
-            background: var(--apple-dark-bg);
-            color: #ffffff;
-            min-height: 100vh;
-            overflow-x: hidden;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
+            background: var(--ios-dark-bg); color: #ffffff; min-height: 100vh; overflow-x: hidden; padding: 1.5rem;
             background-image: 
-                radial-gradient(circle at 80% 20%, rgba(255, 59, 48, 0.12) 0%, transparent 50%),
-                radial-gradient(circle at 15% 80%, rgba(255, 59, 48, 0.04) 0%, transparent 40%);
+                radial-gradient(circle at 85% 15%, rgba(255, 59, 48, 0.14) 0%, transparent 45%),
+                radial-gradient(circle at 15% 85%, rgba(255, 59, 48, 0.05) 0%, transparent 40%);
         }
 
-        /* Top iOS Bar */
-        .header-nav {
+        /* 1. iOS Dynamic Island Hub Bar */
+        .island-navbar {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 1.2rem 2rem;
-            background: rgba(10, 10, 10, 0.4);
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--apple-glass-border);
-            border-radius: 20px;
-            margin-bottom: 3rem;
+            padding: 1.2rem 2.5rem; background: rgba(10, 10, 12, 0.5);
+            backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
+            border: 1px solid var(--ios-border-glass); border-radius: 24px; margin-bottom: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; z-index: 10;
         }
-
-        .brand { font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
-        .brand span { color: var(--apple-red); font-weight: 900; }
+        .brand-core { font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; display: flex; align-items: center; gap: 8px; }
+        .brand-core span { color: var(--ios-red); text-shadow: 0 0 15px rgba(255,59,48,0.4); }
         
-        .pulse-container { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: #86868b; }
-        .pulse-dot { width: 8px; height: 8px; background: var(--apple-red); border-radius: 50%; box-shadow: 0 0 12px var(--apple-red); animation: io-pulse 2s infinite; }
+        /* 2. iOS Native Mode/Page Controls */
+        .page-navigation-dock { display: flex; gap: 0.5rem; background: rgba(0,0,0,0.4); padding: 5px; border-radius: 100px; border: 1px solid var(--ios-border-glass); }
+        .nav-dock-btn {
+            padding: 8px 18px; border: none; background: transparent; color: var(--ios-text-secondary);
+            font-size: 0.85rem; font-weight: 600; cursor: pointer; border-radius: 100px; transition: var(--io-speed) var(--io-curve);
+        }
+        .nav-dock-btn.active { background: #ffffff; color: #000000; box-shadow: 0 4px 15px rgba(255,255,255,0.2); }
+
+        /* 3. Main Multi-Page Wrapper Matrix */
+        .page-module-container { position: relative; width: 100%; }
+        .dashboard-page {
+            display: grid; grid-template-columns: 1.4fr 1fr; gap: 2rem;
+            position: absolute; width: 100%; top: 0; left: 0; opacity: 0; visibility: hidden;
+            transform: scale(0.96) translateY(20px); transition: opacity var(--io-speed) var(--io-curve), transform var(--io-speed) var(--io-curve), visibility var(--io-speed);
+        }
+        .dashboard-page.active { opacity: 1; visibility: visible; transform: scale(1) translateY(0); position: relative; }
+
+        /* 4. Left Core Modules Grid */
+        .operational-suite { display: flex; flex-direction: column; gap: 2rem; }
         
-        @keyframes io-pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+        /* 5. Fluid Responsive Typography Hero Block */
+        .hero-matrix h1 { font-size: 4.8rem; font-weight: 900; line-height: 1; letter-spacing: -3px; margin-bottom: 1rem; }
+        .hero-matrix h1 marquee-text { color: var(--ios-red); display: block; }
+        .hero-matrix p { color: var(--ios-text-secondary); font-size: 1.2rem; line-height: 1.6; max-width: 90%; }
 
-        /* Main Grid Hub Layout */
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: 1.4fr 1fr;
-            gap: 2.5rem;
-            flex: 1;
+        /* 6. Advanced Role Swapper Panel Container */
+        .interactive-deck-panel {
+            background: var(--ios-card-glass); border: 1px solid var(--ios-border-glass);
+            border-radius: 32px; padding: 2rem; backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.05);
         }
-
-        /* Left Side: Hero & Dynamic Feature Switcher */
-        .interactive-zone { display: flex; flex-direction: column; gap: 2.5rem; }
+        .deck-navigation-strip { display: flex; background: rgba(0,0,0,0.5); padding: 6px; border-radius: 100px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.02); }
+        .deck-tab { flex: 1; padding: 12px; border: none; background: transparent; color: var(--ios-text-secondary); font-weight: 700; cursor: pointer; border-radius: 100px; transition: var(--io-speed) var(--io-curve); }
+        .deck-tab.active { background: var(--ios-red); color: #ffffff; box-shadow: var(--ios-glow); }
         
-        .hero-banner h1 {
-            font-size: 4.2rem; font-weight: 800; line-height: 1.05; letter-spacing: -2.5px; margin-bottom: 1rem;
-        }
-        .hero-banner h1 em { font-style: normal; color: var(--apple-red); }
-        .hero-banner p { color: #86868b; font-size: 1.15rem; line-height: 1.6; max-width: 85%; }
+        /* 7. Super Smooth Blurry Slider Matrix */
+        .slider-viewport { position: relative; overflow: hidden; height: 180px; }
+        .rolling-deck { display: flex; width: 300%; transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1); }
+        .deck-slide { width: 33.333%; padding: 0 10px; }
+        .slide-card-glass { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04); padding: 2rem; border-radius: 24px; height: 100%; transition: backdrop-filter 0.5s; }
+        .slide-card-glass h3 { font-size: 1.5rem; margin-bottom: 10px; font-weight: 700; display: flex; align-items: center; gap: 12px; }
+        .slide-card-glass h3::before { content: ''; width: 6px; height: 18px; background: var(--ios-red); border-radius: 10px; display: inline-block; }
+        .slide-card-glass p { color: var(--ios-text-secondary); font-size: 1rem; line-height: 1.6; }
 
-        /* Role Switcher Interface */
-        .role-panel {
-            background: var(--apple-card-bg);
-            border: 1px solid var(--apple-glass-border);
-            border-radius: 28px; padding: 2rem;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        }
+        /* 8. Right Core Telemetry Deck */
+        .telemetry-suite { display: flex; flex-direction: column; gap: 2rem; }
 
-        .role-tabs {
-            display: flex; background: rgba(0,0,0,0.4); padding: 6px; border-radius: 100px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.03);
+        /* 9. HTML5 Mathematical Interactive Canvas Simulation Node */
+        .canvas-node-frame {
+            height: 350px; background: rgba(8, 8, 10, 0.8); border: 1px solid rgba(255, 59, 48, 0.15);
+            border-radius: 32px; position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.9);
         }
+        .canvas-node-frame canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+        .canvas-overlay-content { position: relative; z-index: 2; text-align: center; }
+        .canvas-overlay-content h2 { font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; }
+        .canvas-overlay-content p { font-size: 0.8rem; color: var(--ios-red); font-weight: 800; letter-spacing: 5px; margin-top: 6px; text-transform: uppercase; }
 
-        .tab-btn {
-            flex: 1; padding: 12px; border: none; background: transparent; color: #86868b;
-            font-size: 0.95rem; font-weight: 600; cursor: pointer; border-radius: 100px; transition: var(--io-transition);
+        /* 10. Advanced Bento Box Matrix */
+        .bento-grid-matrix { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; }
+        .bento-node-unit {
+            background: var(--ios-card-glass); border: 1px solid var(--ios-border-glass); border-radius: 24px;
+            padding: 1.5rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: var(--io-speed) var(--io-curve);
         }
+        .bento-node-unit:hover { border-color: rgba(255, 59, 48, 0.35); transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
+        .bento-meta-label { font-size: 0.75rem; color: var(--ios-text-secondary); text-transform: uppercase; letter-spacing: 2px; font-weight: 700; margin-bottom: 8px; }
+        .bento-meta-value { font-size: 2.2rem; font-weight: 900; letter-spacing: -1px; }
+        .bento-meta-value.danger-glow { color: var(--ios-red); text-shadow: 0 0 15px rgba(255,59,48,0.4); }
 
-        .tab-btn.active {
-            background: #ffffff; color: #000000; box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        /* 11. Hyper Realistic 3D Pressed Macro Action Controller */
+        .tactile-macro-button {
+            grid-column: span 2; background: #ffffff; color: #000000; border: none; padding: 20px;
+            border-radius: 100px; font-size: 1.1rem; font-weight: 800; cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); display: flex; justify-content: center; align-items: center; gap: 12px;
+            box-shadow: 0 15px 35px rgba(255,255,255,0.15);
         }
+        .tactile-macro-button:hover { background: #f5f5f7; transform: translateY(-2px); box-shadow: 0 20px 40px rgba(255,255,255,0.2); }
+        .tactile-macro-button:active { transform: scale(0.94) translateY(0); box-shadow: 0 5px 10px rgba(255,255,255,0.05); }
 
-        /* Sliding Card Deck Showcase */
-        .deck-wrapper { position: relative; overflow: hidden; height: 160px; }
-        .feature-deck { display: flex; width: 300%; transition: var(--io-transition); }
-        
-        .feature-card {
-            width: 33.333%; padding: 0 10px;
-        }
-        .card-inner {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-            padding: 1.5rem; border-radius: 20px; height: 100%;
-        }
-        .card-inner h3 { font-size: 1.3rem; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 10px;}
-        .card-inner h3::before { content: '✓'; color: var(--apple-red); font-weight: 900;}
-        .card-inner p { color: #86868b; font-size: 0.95rem; line-height: 1.5; }
-
-        /* Right Side: Visual Core & Bento Analytics */
-        .telemetry-zone { display: flex; flex-direction: column; gap: 2.5rem; }
-
-        .apple-jelly-node {
-            height: 320px; background: rgba(12, 12, 14, 0.7);
-            border: 1px solid rgba(255, 59, 48, 0.15); border-radius: 32px;
-            display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden;
-            box-shadow: inset 0 0 40px rgba(255, 59, 48, 0.05);
-        }
-
-        .jelly-core {
-            width: 130px; height: 130px; background: var(--apple-red);
-            border-radius: 50%; filter: blur(60px); opacity: 0.6;
-            animation: core-breathing 4s infinite alternate ease-in-out;
+        /* 12. Realtime Execution Console Grid */
+        .live-stream-terminal {
+            grid-column: span 2; background: rgba(0,0,0,0.6); border: 1px solid var(--ios-border-glass);
+            border-radius: 20px; padding: 1.2rem; font-family: monospace; font-size: 0.8rem; height: 120px;
+            overflow-y: hidden; display: flex; flex-direction: column; gap: 6px; color: #34c759;
         }
 
-        @keyframes core-breathing {
-            0% { transform: scale(1); opacity: 0.4; filter: blur(50px); }
-            100% { transform: scale(1.4); opacity: 0.8; filter: blur(75px); }
-        }
-
-        .node-overlay-text {
-            position: absolute; text-align: center; z-index: 2;
-        }
-        .node-overlay-text h2 { font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; text-shadow: 0 4px 20px rgba(0,0,0,0.8); }
-        .node-overlay-text p { font-size: 0.75rem; color: var(--apple-red); font-weight: 800; letter-spacing: 4px; margin-top: 5px; text-transform: uppercase;}
-
-        /* Premium Bento Box Cluster */
-        .bento-box-cluster { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        
-        .bento-unit {
-            background: var(--apple-card-bg); border: 1px solid var(--apple-glass-border);
-            border-radius: 24px; padding: 1.8rem; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            transition: var(--io-transition);
-        }
-        .bento-unit:hover { border-color: rgba(255, 59, 48, 0.3); transform: translateY(-4px); }
-        
-        .bento-label { font-size: 0.75rem; color: #86868b; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-bottom: 8px;}
-        .bento-value { font-size: 2.4rem; font-weight: 800; letter-spacing: -1px; }
-        .bento-value.red-accent { color: var(--apple-red); text-shadow: 0 0 15px rgba(255, 59, 48, 0.3); }
-
-        /* Tactile Action Button iOS Flow */
-        .ios-action-btn {
-            grid-column: span 2; background: #ffffff; color: #000000;
-            border: none; padding: 18px; border-radius: 100px; font-size: 1.05rem; font-weight: 700;
-            cursor: pointer; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex; justify-content: center; align-items: center; gap: 10px;
-            box-shadow: 0 12px 30px rgba(255,255,255,0.1);
-        }
-
-        .ios-action-btn:active { transform: scale(0.96); background: rgba(255,255,255,0.85); }
-        .ios-action-btn svg { fill: currentColor; transition: transform 0.3s ease; }
-        .ios-action-btn:hover svg { transform: translateX(5px); }
-
-        @media (max-width: 968px) {
-            .dashboard-container { grid-template-columns: 1fr; gap: 2rem; }
-            .hero-banner h1 { font-size: 3rem; }
+        /* Responsive Breakpoint Matrix */
+        @media (max-width: 1024px) {
+            .dashboard-page { grid-template-columns: 1fr; gap: 2rem; }
+            .hero-matrix h1 { font-size: 3.5rem; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header-nav">
-        <div class="brand">SentinX <span>APEX</span></div>
-        <div class="pulse-container">
-            <div class="pulse-dot"></div>
-            <span>SECURE CONSOLE ACTIVE</span>
+    <div class="island-navbar">
+        <div class="brand-core">SentinX <span>AI NEURAL</span></div>
+        <div class="page-navigation-dock">
+            <button class="nav-dock-btn active" onclick="navigateDashboardPage('core-hub', this)">Core Hub</button>
+            <button class="nav-dock-btn" onclick="navigateDashboardPage('security-perimeter', this)">Security Perimeter</button>
+            <button class="nav-dock-btn" onclick="navigateDashboardPage('heuristic-analytics', this)">AI Analytics</button>
         </div>
     </div>
 
-    <div class="dashboard-container">
-        
-        <div class="interactive-zone">
-            <div class="hero-banner">
-                <h1>The Core <em>Intelligence</em> For Discord.</h1>
-                <p>An enterprise security system designed with military grade logic algorithms. Plug into the main system to synchronize execution trees effortlessly.</p>
-            </div>
+    <div class="page-module-container">
 
-            <div class="role-panel">
-                <div class="role-tabs">
-                    <button class="tab-btn active" onclick="switchRoleDeck(0, this)">Admin Control</button>
-                    <button class="tab-btn" onclick="switchRoleDeck(1, this)">Moderation Engine</button>
-                    <button class="tab-btn" onclick="switchRoleDeck(2, this)">VIP Safeguard</button>
+        <div class="dashboard-page active" id="core-hub">
+            <div class="operational-suite">
+                <div class="hero-matrix">
+                    <h1>Sovereign <span>AI Matrix</span> Intelligence.</h1>
+                    <p>Sub-atomic packet parsing pipelines built directly into Discord API sockets. Experience maximum firewall protection vectors with multi-threading logic matrices.</p>
                 </div>
 
-                <div class="deck-wrapper">
-                    <div class="feature-deck" id="roleDeck">
-                        <div class="feature-card">
-                            <div class="card-inner">
-                                <h3>Full Engine Sync</h3>
-                                <p>Execute high-level clustering scripts, bypass protocol levels, and gain architectural control over prefix states globally across servers.</p>
+                <div class="interactive-deck-panel">
+                    <div class="deck-navigation-strip">
+                        <button class="deck-tab active" onclick="rollDeckSlider(0, this)">Admin Control Core</button>
+                        <button class="deck-tab" onclick="rollDeckSlider(1, this)">Moderation Firewall</button>
+                        <button class="deck-tab" onclick="rollDeckSlider(2, this)">VIP Tunneling</button>
+                    </div>
+                    <div class="slider-viewport">
+                        <div class="rolling-deck" id="mainRollingDeck">
+                            <div class="deck-slide">
+                                <div class="slide-card-glass">
+                                    <h3>Prefix Kernel Lock</h3>
+                                    <p>[Feature 11, 12] Modify and lock global configuration nodes across high-load microservices. Hot-reloading system clusters are mapped with zero performance friction.</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="feature-card">
-                            <div class="card-inner">
-                                <h3>Lethal Raid Filter</h3>
-                                <p>Automated heuristics analyze message velocity and automatically seal access corridors when dynamic malicious threats are isolated.</p>
+                            <div class="deck-slide">
+                                <div class="slide-card-glass">
+                                    <h3>Anti-Raid Perimeter</h3>
+                                    <p>[Feature 13, 14] Realtime heuristic checking drops instant malicious token storms. Isolates cluster targets automatically under 5ms execution vectors.</p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="feature-card">
-                            <div class="card-inner">
-                                <h3>Neural Tunneling</h3>
-                                <p>Premium high-speed channel priorities assigned automatically to critical operations to guarantee data validation speeds under 20ms.</p>
+                            <div class="deck-slide">
+                                <div class="slide-card-glass">
+                                    <h3>Priority Quantum Sync</h3>
+                                    <p>[Feature 15, 16] Allocated data bandwidth routes critical interaction pipelines past server rate limits. Guaranteed delivery execution across shards.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="telemetry-zone">
-            <div class="apple-jelly-node">
-                <div class="jelly-core"></div>
-                <div class="node-overlay-text">
-                    <h2>SentinX Node v1.0</h2>
-                    <p>DNA System Lock</p>
+            <div class="telemetry-suite">
+                <div class="canvas-node-frame">
+                    <canvas id="neuralMatrixCanvas"></canvas>
+                    <div class="canvas-overlay-content">
+                        <h2>SentinX AI Core</h2>
+                        <p>Dynamic Core Lock</p>
+                    </div>
+                </div>
+
+                <div class="bento-grid-matrix">
+                    <div class="bento-node-unit"><div class="bento-meta-label">Cluster Heartbeat</div><div class="bento-meta-value danger-glow">${ping}ms</div></div>
+                    <div class="bento-node-unit"><div class="bento-meta-label">Accuracy Heuristics</div><div class="bento-meta-value">99.98%</div></div>
+                    <div class="bento-node-unit"><div class="bento-meta-label">Active Shard Allocation</div><div class="bento-meta-value">01/01</div></div>
+                    <div class="bento-node-unit"><div class="bento-meta-label">Kernel Security Lock</div><div class="bento-meta-value" style="color:#34c759;">ARMED</div></div>
+                    
+                    <button class="tactile-macro-button" onclick="initializeDeepNeuralScan(this)">
+                        <span>Initialize Deep Protocol Scan</span>
+                    </button>
+
+                    <div class="live-stream-terminal" id="terminalOutputGrid">
+                        <div>[SYSTEM] Core Engine initialized successfully. Ready for stream parameters.</div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="bento-box-cluster">
-                <div class="bento-unit">
-                    <div class="bento-label">Heartbeat Velocity</div>
-                    <div class="bento-value red-accent">${ping}ms</div>
+        <div class="dashboard-page" id="security-perimeter">
+            <div class="operational-suite">
+                <div class="hero-matrix">
+                    <h1>Active <span>Firewall</span> Corridor Mapping</h1>
+                    <p>Live memory inspection engine evaluating active security patterns inside text channels. Threat tracking blocks malicious packets natively.</p>
                 </div>
-                <div class="bento-unit">
-                    <div class="bento-label">Heuristic Core</div>
-                    <div class="bento-value">99.9%</div>
+                <div class="bento-grid-matrix" style="grid-template-columns: 1fr 1fr;">
+                    <div class="bento-node-unit"><div class="bento-meta-label">Automated Bans</div><div class="bento-meta-value danger-glow">1,402</div></div>
+                    <div class="bento-node-unit"><div class="bento-meta-label">Isolated Malicious Spams</div><div class="bento-meta-value">42,911</div></div>
                 </div>
-                <div class="bento-unit">
-                    <div class="bento-label">Cluster Load</div>
-                    <div class="bento-value">0.02%</div>
+            </div>
+            <div class="telemetry-suite">
+                <div class="interactive-deck-panel">
+                    <h3 style="margin-bottom:15px; font-weight:800;">Memory Extraction Array</h3>
+                    <p style="color:var(--ios-text-secondary); font-size:0.95rem; line-height:1.6;">Continuous automated threat hunting maps server nodes across international API shards. System registers configuration models synchronously.</p>
                 </div>
-                <div class="bento-unit">
-                    <div class="bento-label">System State</div>
-                    <div class="bento-value" style="font-size: 1.8rem; color: #34c759; font-weight:900;">SECURED</div>
-                </div>
+            </div>
+        </div>
 
-                <button class="ios-action-btn" onclick="triggerPremiumSequence()">
-                    <span>Initialize Deep Protocol Scan</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
+        <div class="dashboard-page" id="heuristic-analytics">
+            <div class="operational-suite">
+                <div class="hero-matrix">
+                    <h1>Heuristic <span>Neural Network</span> Analytics</h1>
+                    <p>Dynamic token clustering dashboards running inside background memory blocks. Review machine performance data matrices live.</p>
+                </div>
+                <div class="interactive-deck-panel">
+                    <h3 style="color:var(--ios-red); margin-bottom:10px;">Quantum State Loading</h3>
+                    <p style="color:var(--ios-text-secondary);">Synthesizing threat profile graphs... Realtime charts are dynamically linked with Express websocket nodes.</p>
+                </div>
+            </div>
+            <div class="telemetry-suite">
+                <div class="bento-grid-matrix">
+                    <div class="bento-node-unit"><div class="bento-meta-label">CPU Core Stress</div><div class="bento-meta-value">0.04%</div></div>
+                    <div class="bento-node-unit"><div class="bento-meta-label">Memory Mapping</div><div class="bento-meta-value">14.2 MB</div></div>
+                </div>
             </div>
         </div>
 
     </div>
 
     <script>
-        function switchRoleDeck(slideIndex, element) {
-            // Tab Switch Effect
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        // Fluid Page Navigation Engine
+        function navigateDashboardPage(targetPageId, element) {
+            document.querySelectorAll('.nav-dock-btn').forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
             
-            // Slider Vector Calculations
-            const deck = document.getElementById('roleDeck');
-            const offset = slideIndex * -33.333;
-            deck.style.transform = \`translateX(\${offset}%)\`;
+            document.querySelectorAll('.dashboard-page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(targetPageId).classList.add('active');
         }
 
-        function triggerPremiumSequence() {
-            const btn = document.querySelector('.ios-action-btn');
-            btn.style.background = 'var(--apple-red)';
-            btn.style.color = '#ffffff';
-            btn.querySelector('span').innerText = 'Scanning Engine Grid...';
+        // Rolling Slider Array Engine
+        function rollDeckSlider(index, element) {
+            document.querySelectorAll('.deck-tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+            
+            const deck = document.getElementById('mainRollingDeck');
+            deck.style.transform = \`translateX(\${index * -33.333}%)\`;
+        }
+
+        // Live Log Stream Loop Simulation
+        const logsArray = [
+            "Syncing validation array shards...",
+            "Heuristic verification matches criteria: 100%",
+            "Express routing handshake initialized via Render node",
+            "Discord API pipeline latency mapping checked",
+            "Core Memory parameters isolated and locked safely"
+        ];
+        setInterval(() => {
+            const terminal = document.getElementById('terminalOutputGrid');
+            if(terminal) {
+                const randomLog = logsArray[Math.floor(Math.random() * logsArray.length)];
+                const timeStr = new Date().toLocaleTimeString();
+                const logElement = document.createElement('div');
+                logElement.innerText = \`[\${timeStr}] \${randomLog}\`;
+                terminal.appendChild(logElement);
+                if (terminal.childNodes.length > 5) terminal.removeChild(terminal.firstChild);
+            }
+        }, 3000);
+
+        // Tactile Press Sequence Event Handler
+        function initializeDeepNeuralScan(btn) {
+            btn.style.transform = "scale(0.94)";
+            btn.style.background = "var(--ios-red)";
+            btn.style.color = "#ffffff";
+            btn.querySelector('span').innerText = "Analyzing Architecture Nodes...";
             
             setTimeout(() => {
-                alert('Security Protocol Verification Complete: System fully synchronized with Apple Native Core Architecture.');
-                btn.style.background = '#ffffff';
-                btn.style.color = '#000000';
-                btn.querySelector('span').innerText = 'Initialize Deep Protocol Scan';
-            }, 1200);
+                btn.style.transform = "translateY(-2px)";
+                btn.style.background = "#ffffff";
+                btn.style.color = "#000000";
+                btn.querySelector('span').innerText = "Initialize Deep Protocol Scan";
+                alert("AI Intelligence Dashboard Sync Complete. 32 Matrix Parameters Fully Functional.");
+            }, 1500);
         }
-    </script>
-</body>
-</html>
-`;
 
-// --- EXPRESS WEB SERVER HUB ---
-const app = express();
-app.get('/', (req, res) => {
-    const ping = client.ws.ping > 0 ? client.ws.ping : '42';
-    res.send(getAdvancedDashboard(ping));
-});
+        // Mathematical Canvas Warp Simulation (HTML5 Native Matrix)
+        const canvas = document.getElementById('neuralMatrixCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = canvas.offsetWidth;
+        let height = canvas.height = canvas.offsetHeight;
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log('SaaS Enterprise Dashboard Engine Bound to Port ' + PORT));
+        let points = [];
+        for (let i = 0; i < 25; i++) {
+            points.push({
+                x: Math.random() * width, y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 1.5, vy: (Math.random() - 0.5) * 1.5
+            });
+        }
 
-// --- CORE DISCORD BOT PROCESS ENGINE ---
-client.on('ready', async () => {
-    console.log(`System Identity Authenticated as: ${client.user.tag}`);
-    try {
-        const commands = [
-            new SlashCommandBuilder().setName('ping').setDescription('Verify engine cluster ping latency'),
-            new SlashCommandBuilder().setName('status').setDescription('Outputs the dynamic security matrix status')
-        ];
-        const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
-        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands.map(c => c.toJSON()) });
-        console.log('--- COMMAND ARCHITECTURE RE-SYNCED ---');
-    } catch (err) {
-        console.error('Core Script Registry Overload Error:', err);
-    }
-});
-
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isChatInputCommand()) return;
-    if (interaction.commandName === 'ping') await interaction.reply(`Heartbeat Pipeline: ${client.ws.ping}ms`);
-    if (interaction.commandName === 'status') await interaction.reply('**SentinX Security Cluster Status**: Armed, operational, and monitoring active threads.');
-});
-
-client.login(process.env.DISCORD_TOKEN).catch(e => {
-    console.error("CRITICAL: Environment token invalid or blocked by API gateway.");
-});
+        function renderCanvasMatrixAnimation() {
+            ctx.clearRect(0,0,width,height);
+            ctx.strokeStyle = "rgba(255, 59, 48, 0.08)";
+            ctx.lineWidth = 1;
+            
+            for(let i=0; i<points.length
