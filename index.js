@@ -1,60 +1,36 @@
 const { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder, ActivityType } = require('discord.js');
-const express = require('express');
 const fs = require('fs');
 require('dotenv').config();
 
-const app = express();
-app.get('/', (req, res) => res.send('SentinX Apex Predator Online'));
-app.listen(process.env.PORT || 3000);
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
 
-const client = new Client({ 
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] 
-});
-
-const createEmbed = (title, description, color) => {
-    return new EmbedBuilder()
-        .setTitle(title)
-        .setDescription(description)
-        .setColor(color)
-        .setTimestamp()
-        .setFooter({ text: 'SentinX Intelligence | Apex Predator Node v1.0' });
+const createEmbed = (title, desc, color) => {
+    return new EmbedBuilder().setTitle(title).setDescription(desc).setColor(color).setFooter({ text: 'SentinX Node v1.0' });
 };
 
 const commands = [
-    new SlashCommandBuilder().setName('ping').setDescription('Check latency'),
-    new SlashCommandBuilder().setName('status').setDescription('View health'),
-    new SlashCommandBuilder().setName('hive-mind').setDescription('Sync nodes'),
-    new SlashCommandBuilder().setName('anti-raid').setDescription('Toggle shield'),
-    new SlashCommandBuilder().setName('setstatus').setDescription('Change status')
-        .addStringOption(option => option.setName('text').setDescription('Text').setRequired(true))
-].map(cmd => cmd.toJSON());
+    new SlashCommandBuilder().setName('ping').setDescription('Latency'),
+    new SlashCommandBuilder().setName('status').setDescription('Health'),
+    new SlashCommandBuilder().setName('setstatus').setDescription('Owner only').addStringOption(o => o.setName('text').setDescription('text').setRequired(true))
+].map(c => c.toJSON());
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
 client.on('ready', async () => {
-    try {
-        await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
-        console.log('SentinX is LIVE.');
-    } catch (e) { console.error(e); }
+    await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
+    console.log('Bot is online!');
 });
 
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isChatInputCommand()) return;
-
-    if (interaction.commandName === 'setstatus') {
-        const config = JSON.parse(fs.readFileSync('config.json', 'utf8'));
-        if (interaction.user.id !== config.ownerId) {
-            return interaction.reply({ content: '❌ Access Denied.', ephemeral: true });
-        }
-        const newStatus = interaction.options.getString('text');
-        client.user.setActivity(newStatus, { type: ActivityType.Playing });
-        await interaction.reply({ embeds: [createEmbed('✅ Status', `Set to: ${newStatus}`, '#00C853')] });
+client.on('interactionCreate', async i => {
+    if (!i.isChatInputCommand()) return;
+    if (i.commandName === 'setstatus') {
+        if (i.user.id !== config.ownerId) return i.reply({ content: 'Denied', ephemeral: true });
+        client.user.setActivity(i.options.getString('text'), { type: ActivityType.Playing });
+        i.reply({ embeds: [createEmbed('Success', 'Status updated', '#00C853')] });
     }
-    
-    if (interaction.commandName === 'ping') await interaction.reply({ embeds: [createEmbed('📡 Latency', `${client.ws.ping}ms`, '#00C853')] });
-    if (interaction.commandName === 'status') await interaction.reply({ embeds: [createEmbed('⚙️ Status', 'Operational', '#FFD600')] });
-    if (interaction.commandName === 'hive-mind') await interaction.reply({ embeds: [createEmbed('🔗 Hive Mind', 'Synced', '#00C853')] });
-    if (interaction.commandName === 'anti-raid') await interaction.reply({ embeds: [createEmbed('🛡️ Shield', 'MAXIMUM', '#D50000')] });
+    if (i.commandName === 'ping') i.reply({ embeds: [createEmbed('Ping', `${client.ws.ping}ms`, '#00C853')] });
+    if (i.commandName === 'status') i.reply({ embeds: [createEmbed('Status', 'Operational', '#FFD600')] });
 });
 
 client.login(process.env.DISCORD_TOKEN);
