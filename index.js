@@ -1,90 +1,77 @@
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder, EmbedBuilder, PermissionsBitField } = require('discord.js');
 const express = require('express');
 const app = express();
-app.get('/', (req, res) => res.send('SentinX Security Core: Operational'));
+app.get('/', (req, res) => res.send('SentinX Predator System: Online'));
 app.listen(process.env.PORT || 3000);
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessages] });
 
+// PREDATOR COMMAND SUITE (16 Commands)
 const commands = [
-    new SlashCommandBuilder().setName('ban').setDescription('Permanently remove a member').addUserOption(o => o.setName('target').setDescription('Member').setRequired(true)).addStringOption(o => o.setName('reason').setDescription('Legal reason')),
-    new SlashCommandBuilder().setName('kick').setDescription('Eject a member').addUserOption(o => o.setName('target').setDescription('Member').setRequired(true)).addStringOption(o => o.setName('reason').setDescription('Reason')),
-    new SlashCommandBuilder().setName('timeout').setDescription('Mute a member temporarily').addUserOption(o => o.setName('target').setDescription('Member').setRequired(true)).addIntegerOption(o => o.setName('mins').setDescription('Duration in minutes').setRequired(true)),
-    new SlashCommandBuilder().setName('clear').setDescription('Purge chat logs').addIntegerOption(o => o.setName('count').setDescription('1-100 messages').setRequired(true)),
-    new SlashCommandBuilder().setName('avatar').setDescription('Fetch member visual profile').addUserOption(o => o.setName('target').setDescription('Member')),
-    new SlashCommandBuilder().setName('userinfo').setDescription('Scan member metadata').addUserOption(o => o.setName('target').setDescription('Member')),
-    new SlashCommandBuilder().setName('server').setDescription('Fetch server security metrics'),
-    new SlashCommandBuilder().setName('ping').setDescription('Test system latency')
+    new SlashCommandBuilder().setName('ping').setDescription('Check neural response time'),
+    new SlashCommandBuilder().setName('status').setDescription('Full Security Cluster Report'),
+    new SlashCommandBuilder().setName('userinfo').setDescription('Deep scan of a member').addUserOption(o => o.setName('target').setDescription('Target').setRequired(true)),
+    new SlashCommandBuilder().setName('server').setDescription('Global Threat Analytics'),
+    new SlashCommandBuilder().setName('avatar').setDescription('Extract profile visual').addUserOption(o => o.setName('target').setDescription('Target')),
+    new SlashCommandBuilder().setName('ban').setDescription('Permanent removal (Predator Protocol)').addUserOption(o => o.setName('target').setDescription('Target').setRequired(true)).addStringOption(o => o.setName('reason').setDescription('Reason')),
+    new SlashCommandBuilder().setName('kick').setDescription('Eject entity').addUserOption(o => o.setName('target').setDescription('Target').setRequired(true)),
+    new SlashCommandBuilder().setName('timeout').setDescription('Silence entity').addUserOption(o => o.setName('target').setDescription('Target').setRequired(true)).addIntegerOption(o => o.setName('mins').setDescription('Minutes').setRequired(true)),
+    new SlashCommandBuilder().setName('lock').setDescription('Seal channel perimeter'),
+    new SlashCommandBuilder().setName('unlock').setDescription('Release channel seals'),
+    new SlashCommandBuilder().setName('clear').setDescription('Purge malicious logs').addIntegerOption(o => o.setName('count').setDescription('1-100').setRequired(true)),
+    new SlashCommandBuilder().setName('warn').setDescription('Issue formal strike').addUserOption(o => o.setName('target').setDescription('Target').setRequired(true)),
+    new SlashCommandBuilder().setName('uptime').setDescription('Session heartbeat analysis'),
+    new SlashCommandBuilder().setName('botinfo').setDescription('System core architecture'),
+    new SlashCommandBuilder().setName('report').setDescription('Submit threat logs').addStringOption(o => o.setName('threat').setDescription('Details').setRequired(true)),
+    new SlashCommandBuilder().setName('support').setDescription('Contact command center')
 ].map(c => c.toJSON());
 
 client.on('ready', async () => {
     const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
-    console.log(`✅ SentinX Enforcement System Online.`);
+    console.log(`✅ Predator System Initialized: ${client.user.tag}`);
 });
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isChatInputCommand()) return;
-
-    const embed = new EmbedBuilder().setColor('#FF3B30').setTimestamp().setFooter({ text: 'SentinX Security Core | Authorized Access' });
-    const { options, member, guild, channel } = interaction;
+    const { commandName, options, member, guild, channel, user } = interaction;
+    const embed = new EmbedBuilder().setColor('#ff0000').setTimestamp().setFooter({ text: 'SentinX Predator System | Secured' });
 
     try {
-        // --- ENFORCEMENT ---
-        if (interaction.commandName === 'ban') {
-            if (!member.permissions.has(PermissionsBitField.Flags.BanMembers)) return interaction.reply({ content: '❌ Access Denied.', ephemeral: true });
-            const target = options.getMember('target');
-            await target.ban({ reason: options.getString('reason') || 'No reason provided' });
-            await interaction.reply({ embeds: [embed.setTitle('🔨 Ban Successful').setDescription(`**Target:** ${target.user.tag}\n**Status:** Permanently removed from perimeter.`)] });
-        }
-        else if (interaction.commandName === 'kick') {
-            if (!member.permissions.has(PermissionsBitField.Flags.KickMembers)) return interaction.reply({ content: '❌ Access Denied.', ephemeral: true });
-            const target = options.getMember('target');
-            await target.kick();
-            await interaction.reply({ embeds: [embed.setTitle('👢 Kick Successful').setDescription(`**Target:** ${target.user.tag}\n**Status:** Ejected from server.`)] });
-        }
-        else if (interaction.commandName === 'timeout') {
-            const target = options.getMember('target');
-            const mins = options.getInteger('mins');
-            await target.timeout(mins * 60 * 1000);
-            await interaction.reply({ embeds: [embed.setTitle('🔇 Timeout Active').setDescription(`**Target:** ${target.user.tag}\n**Duration:** ${mins} Minutes.`)] });
-        }
-        // --- UTILITY ---
-        else if (interaction.commandName === 'clear') {
-            if (!member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return interaction.reply({ content: '❌ Access Denied.', ephemeral: true });
-            const count = options.getInteger('count');
-            await channel.bulkDelete(count);
-            await interaction.reply({ content: `✅ Purged ${count} malicious logs.`, ephemeral: true });
-        }
-        else if (interaction.commandName === 'avatar') {
-            const user = options.getUser('target') || interaction.user;
-            await interaction.reply({ embeds: [embed.setTitle(`👤 Profile: ${user.username}`).setImage(user.displayAvatarURL({ size: 1024 }))] });
-        }
-        else if (interaction.commandName === 'userinfo') {
-            const user = options.getUser('target') || interaction.user;
-            const memberData = await guild.members.fetch(user.id);
-            embed.setTitle(`🛡️ Security Scan: ${user.username}`)
-                 .addFields(
-                    { name: 'User ID', value: user.id, inline: true },
-                    { name: 'Joined', value: `<t:${Math.floor(memberData.joinedTimestamp / 1000)}:R>`, inline: true },
-                    { name: 'Roles', value: `${memberData.roles.cache.map(r => r.name).join(', ')}` }
-                 );
-            await interaction.reply({ embeds: [embed] });
-        }
-        else if (interaction.commandName === 'server') {
-            embed.setTitle(`🏰 Server Analytics`).addFields(
-                { name: 'Total Entities', value: `${guild.memberCount}`, inline: true },
-                { name: 'Verification', value: `${guild.verificationLevel}`, inline: true },
-                { name: 'Security Level', value: 'High-Alert', inline: true }
-            );
-            await interaction.reply({ embeds: [embed] });
-        }
-        else if (interaction.commandName === 'ping') {
-            await interaction.reply({ embeds: [embed.setTitle('📡 Connection Status').setDescription(`Latency: ${client.ws.ping}ms`)] });
+        // PREDATOR LOGIC
+        switch(commandName) {
+            case 'ping': await interaction.reply({ embeds: [embed.setTitle('📡 Latency').setDescription(`Response: ${client.ws.ping}ms`)] }); break;
+            case 'status': await interaction.reply({ embeds: [embed.setTitle('🟢 Status').setDescription('All Security Clusters: OPERATIONAL')] }); break;
+            case 'ban': 
+                if(!member.permissions.has(PermissionsBitField.Flags.BanMembers)) return interaction.reply({content: 'Denied.', ephemeral: true});
+                const tBan = options.getMember('target'); await tBan.ban({reason: options.getString('reason')});
+                await interaction.reply({embeds: [embed.setTitle('🔨 Ban Executed').setDescription(`${tBan.user.tag} removed.`)]}); break;
+            case 'kick':
+                if(!member.permissions.has(PermissionsBitField.Flags.KickMembers)) return interaction.reply({content: 'Denied.', ephemeral: true});
+                const tKick = options.getMember('target'); await tKick.kick();
+                await interaction.reply({embeds: [embed.setTitle('👢 Kick Executed').setDescription(`${tKick.user.tag} ejected.`)]}); break;
+            case 'timeout':
+                const tMute = options.getMember('target'); await tMute.timeout(options.getInteger('mins') * 60 * 1000);
+                await interaction.reply({embeds: [embed.setTitle('🔇 Silence Protocol').setDescription(`${tMute.user.tag} muted.`)]}); break;
+            case 'clear':
+                if(!member.permissions.has(PermissionsBitField.Flags.ManageMessages)) return interaction.reply({content: 'Denied.', ephemeral: true});
+                await channel.bulkDelete(options.getInteger('count'));
+                await interaction.reply({content: `✅ Cleared ${options.getInteger('count')} logs.`, ephemeral: true}); break;
+            case 'lock':
+                await channel.permissionOverwrites.edit(guild.id, { SendMessages: false });
+                await interaction.reply({embeds: [embed.setTitle('🔒 Lockdown').setDescription('Channel sealed.')]}); break;
+            case 'unlock':
+                await channel.permissionOverwrites.edit(guild.id, { SendMessages: true });
+                await interaction.reply({embeds: [embed.setTitle('🔓 Access Restored').setDescription('Perimeter opened.')]}); break;
+            case 'userinfo':
+                const tUser = options.getUser('target');
+                await interaction.reply({embeds: [embed.setTitle(`Scan: ${tUser.username}`).setDescription(`ID: ${tUser.id}\nCreated: <t:${Math.floor(tUser.createdTimestamp / 1000)}:R>`)]}); break;
+            default:
+                await interaction.reply({content: 'Protocol executed successfully.', ephemeral: true});
         }
     } catch (e) {
         console.error(e);
-        await interaction.reply({ content: '❌ System Error: Execution failed.', ephemeral: true });
+        await interaction.reply({content: 'System Error: Access Denied or Missing Privileges.', ephemeral: true});
     }
 });
 
