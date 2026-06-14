@@ -27,7 +27,7 @@ const MinimalEmbed = (title, description = null) => {
 };
 
 // ==========================================
-// 🚀 COMMANDS REGISTRY (Overwrites old configs)
+// 🚀 COMMANDS REGISTRY (Keeps all old + adds 2 new ones)
 // ==========================================
 const commandsData = [
     new SlashCommandBuilder().setName('ping').setDescription('Check system latency'),
@@ -40,6 +40,18 @@ const commandsData = [
     new SlashCommandBuilder().setName('unlock').setDescription('Unlock current sector'),
     new SlashCommandBuilder().setName('threatscan').setDescription('Scan user for threats').addUserOption(o => o.setName('target').setDescription('User').setRequired(true)),
     
+    // 👑 NEW ROLE UTILITY COMMANDS
+    new SlashCommandBuilder().setName('role_icon')
+        .setDescription('Modify a role icon and hex color (Admin/Owner Only)')
+        .addRoleOption(o => o.setName('role').setDescription('Select the target role').setRequired(true))
+        .addStringOption(o => o.setName('color').setDescription('Hex Color Code (e.g., #FF0000)').setRequired(true))
+        .addStringOption(o => o.setName('icon_url').setDescription('URL of the icon image (Must be from this server context)').setRequired(false)),
+
+    new SlashCommandBuilder().setName('role_create')
+        .setDescription('Instantly forge a new server role')
+        .addStringOption(o => o.setName('name').setDescription('Enter role name').setRequired(true))
+        .addBooleanOption(o => o.setName('display').setDescription('Display role separately in member list? (True/False)').setRequired(true)),
+
     // 🌍 HIVEMIND GLOBAL PROTOCOLS (DEV ONLY)
     new SlashCommandBuilder().setName('hivemind_nuke').setDescription('⚠️ GLOBAL LOCKDOWN & BAN (Dev Only)').addUserOption(o => o.setName('target').setDescription('Culprit to globally ban').setRequired(true)),
     new SlashCommandBuilder().setName('hivemind_restore').setDescription('✅ GLOBAL UNLOCK (Dev Only)')
@@ -48,9 +60,9 @@ const commandsData = [
 client.once('ready', async () => {
     const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     try {
-        console.log('🔄 Syncing Minimalist Protocols...');
+        console.log('🔄 Syncing All Hivemind Protocols...');
         await rest.put(Routes.applicationCommands(client.user.id), { body: commandsData });
-        console.log(`✅ [HIVEMIND] Online. Developer Profile Locked: Vasudev Roy.`);
+        console.log(`✅ [HIVEMIND] Online. 13 Protocols Deployed. Developer: Vasudev Roy.`);
     } catch (e) { console.error(e); }
 });
 
@@ -92,6 +104,9 @@ client.on('interactionCreate', async i => {
     await i.deferReply({ ephemeral: cmd === 'clear' }); 
 
     try {
+        // Checking Admin / Owner status for specific administrative operations
+        const isAdminOrOwner = i.member.permissions.has(PermissionsBitField.Flags.Administrator) || i.guild.ownerId === i.user.id;
+
         switch (cmd) {
             case 'ping':
                 const pingEmbed = MinimalEmbed('System Latency')
@@ -164,6 +179,53 @@ client.on('interactionCreate', async i => {
                 const status = risk > 75 ? '🔴 HIGH THREAT' : risk > 30 ? '🟡 MODERATE RISK' : '🟢 SECURE';
                 return i.editReply({ embeds: [MinimalEmbed('Security Scan Results').addFields({ name: `Target: ${tTarget.tag}`, value: `Threat Level: **${risk}%**\nStatus: **${status}**` })] });
 
+            // 👑 NEW: ROLE ICON & COLOR LOGIC
+            case 'role_icon':
+                if (!isAdminOrOwner) return i.editReply({ embeds: [MinimalEmbed('Access Denied', 'This command is strictly locked to Server Admins and the Server Owner.')] });
+                
+                const targetRole = i.options.getRole('role');
+                const hexColor = i.options.getString('color');
+                const iconUrl = i.options.getString('icon_url');
+
+                // Validating Hex Code Format
+                if (!/^#([A-Fa-f0-9]{6})$/.test(hexColor)) {
+                    return i.editReply({ embeds: [MinimalEmbed('Modification Failed', 'Invalid Hex Color code format. Please use formats like `#FF0000`.')] });
+                }
+
+                // Check bot hierarchy permissions
+                if (targetRole.position >= i.guild.members.me.roles.highest.position) {
+                    return i.editReply({ embeds: [MinimalEmbed('Hierarchy Conflict', 'The target role is higher than or equal to my highest role system position.')] });
+                }
+
+                try {
+                    const updateData = { color: hexColor };
+                    // Role Icon feature requires Tier 2 Server Boost level on Discord natively
+                    if (iconUrl) updateData.icon = iconUrl; 
+
+                    await targetRole.edit(updateData);
+                    return i.editReply({ embeds: [MinimalEmbed('Role Adjusted Successfully', `Modified **${targetRole.name}** metadata.\n• **New Color:** \`${hexColor}\`\n• **Icon Parameter:** ${iconUrl ? 'Updated' : 'Unchanged'}`)] });
+                } catch (err) {
+                    return i.editReply({ embeds: [MinimalEmbed('Execution Failed', `Could not apply updates. Ensure the Icon URL is correct and server boost parameters allow custom role icons.`)] });
+                }
+
+            // 👑 NEW: ROLE CREATE LOGIC
+            case 'role_create':
+                if (!i.member.permissions.has(PermissionsBitField.Flags.ManageRoles)) return i.editReply({ embeds: [MinimalEmbed('Access Denied', 'You require `Manage Roles` permission parameters to execute this.')] });
+
+                const roleName = i.options.getString('name');
+                const displaySeparately = i.options.getBoolean('display');
+
+                try {
+                    const newRole = await i.guild.roles.create({
+                        name: roleName,
+                        hoist: displaySeparately,
+                        reason: `Forged via Hivemind system by ${i.user.tag}`
+                    });
+                    return i.editReply({ embeds: [MinimalEmbed('Role Forged Successfully', `A new transmission matrix has been built:\n• **Role:** ${newRole}\n• **Separated Display:** \`${displaySeparately}\``)] });
+                } catch (err) {
+                    return i.editReply({ embeds: [MinimalEmbed('Creation Failed', 'Failed to forge the role. Ensure my system permissions cover `Manage Roles`.')] });
+                }
+
             // ==========================================
             // 🚨 HIVEMIND GLOBAL PROTOCOLS (OMEGA SHIELD)
             // ==========================================
@@ -179,11 +241,8 @@ client.on('interactionCreate', async i => {
 
                 client.guilds.cache.forEach(async guild => {
                     try {
-                        // 1. Global Ban
                         await guild.members.ban(culprit.id, { reason: 'HIVEMIND GLOBAL THREAT SYSTEM DETECTED' }).catch(()=>{});
-                        // 2. Lock server access entirely
                         await guild.roles.everyone.setPermissions(guild.roles.everyone.permissions.remove(PermissionsBitField.Flags.SendMessages)).catch(()=>{});
-                        // 3. Drop Warning Anchor
                         const sysChannel = guild.systemChannel || guild.channels.cache.find(c => c.isTextBased() && c.permissionsFor(guild.members.me).has('SendMessages'));
                         if (sysChannel) sysChannel.send({ embeds: [dangerEmbed] });
                     } catch (e) {}
