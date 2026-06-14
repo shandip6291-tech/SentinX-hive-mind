@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 require('dotenv').config();
 
-// --- 1. DASHBOARD & KEEP-ALIVE SERVER ---
+// --- DASHBOARD & KEEP-ALIVE SERVER ---
 app.get('/', (req, res) => {
     res.send(`
         <html>
@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 });
 app.listen(process.env.PORT || 3000);
 
-// --- 2. BOT CONFIGURATION ---
+// --- BOT CONFIGURATION ---
 const client = new Client({ 
     intents: [
         GatewayIntentBits.Guilds, 
@@ -27,7 +27,7 @@ const client = new Client({
     ] 
 });
 
-// --- 3. COMMAND REGISTRATION ---
+// --- COMMAND REGISTRATION ---
 const commands = [
     new SlashCommandBuilder().setName('ping').setDescription('Check SentinX heartbeat'),
     new SlashCommandBuilder().setName('status').setDescription('System health check'),
@@ -44,16 +44,14 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
     } catch (e) { console.error(e); }
 })();
 
-// --- 4. CORE AI & SECURITY LOGIC ---
+// --- CORE LOGIC ---
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
     
-    // AI Intelligence Trigger
     if (message.content.startsWith('!ai')) {
         await message.reply('SentinX AI: Processing query... Analysis complete: Apex Predator protocol suggests maximum efficiency.');
     }
     
-    // Security Trigger
     if (message.content.toLowerCase() === 'warning-trigger') {
         const embed = new EmbedBuilder()
             .setColor('#ff0000')
