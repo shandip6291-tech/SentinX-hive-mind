@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { Client, GatewayIntentBits, EmbedBuilder, REST, Routes, SlashCommandBuilder } = require('discord.js');
 const express = require('express');
 const fs = require('fs');
 require('dotenv').config();
@@ -10,8 +10,8 @@ app.listen(process.env.PORT || 3000);
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMembers] });
 
-// Command List
-const cmdNames = ['ping', 'status', 'help', 'ban', 'kick', 'clear', 'lock', 'unlock', 'nuke', 'warn', 'setprefix', 'setstatus', 'hive-mind', 'anti-raid', 'kill-mode'];
+// Command List (Nuke removed, Purge-All added)
+const cmdNames = ['ping', 'status', 'help', 'ban', 'kick', 'clear', 'lock', 'unlock', 'purge-all', 'warn', 'setprefix', 'setstatus', 'hive-mind', 'anti-raid', 'kill-mode'];
 const commands = cmdNames.map(name => new SlashCommandBuilder().setName(name).setDescription(`Execute ${name} protocol`).toJSON());
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
@@ -19,7 +19,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 client.on('ready', async () => {
     try {
         await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
-        console.log('SentinX: 15+ Commands Synced.');
+        console.log('SentinX: 15 Commands Synced.');
     } catch (err) { console.error(err); }
 });
 
@@ -36,6 +36,9 @@ client.on('interactionCreate', async i => {
             case 'status':
                 embed.setTitle('System Status').setDescription('Apex Predator Node: **OPERATIONAL**');
                 await i.reply({ embeds: [embed] });
+                break;
+            case 'purge-all':
+                await i.reply('>> PROTOCOL: PURGE-ALL INITIATED. Clearing target vector.');
                 break;
             case 'help':
                 await i.reply(`Protocol List: ${cmdNames.join(', ')}`);
