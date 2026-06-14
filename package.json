@@ -1,7 +1,7 @@
 {
-  "name": "sentinx-hive-mind",
+  "name": "sentinx-apex-predator",
   "version": "1.0.0",
-  "description": "SentinX Apex Predator Bot with Dashboard",
+  "description": "SentinX Security Ecosystem",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
